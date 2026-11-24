@@ -17,11 +17,16 @@ def main() -> None:
     # Gate self-check: UTF-8 text, 1-280 characters, not only whitespace.
     assert 1 <= len(ENTRY) <= 280, f"entry is {len(ENTRY)} chars, must be 1-280"
     assert ENTRY.strip(), "entry must not be only whitespace"
-    assert len(ENTRY.strip().splitlines()) == 2, "entry must be exactly two lines"
+    lines = ENTRY.strip().splitlines()
+    assert len(lines) == 2, "entry must be exactly two lines"
+    assert all(line.strip() for line in lines), "neither line may be blank"
     import os
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8") as f:
         f.write(ENTRY)
+    # Read-back verification: what landed on disk must be exactly the entry.
+    with open("/output/entry.txt", encoding="utf-8") as f:
+        assert f.read() == ENTRY, "entry.txt on disk differs from the entry"
 
 
 if __name__ == "__main__":
